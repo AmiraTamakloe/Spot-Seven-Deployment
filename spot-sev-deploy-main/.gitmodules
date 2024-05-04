@@ -1,0 +1,11 @@
+[submodule "spot-sev-deploy"]
+	path = spot-sev-deploy
+	url = git@gitlab.com:polytechnique-montr-al/log3900/24-1/equipe-103/spot-sev-deploy.git
+[submodule "spot-sev-tf"]
+	path = spot-sev-tf
+	url = git@gitlab.com:polytechnique-montr-al/log3900/24-1/equipe-103/spot-sev-tf.git
+	branch = main
+[submodule "spot-sev-ansible"]
+	path = spot-sev-ansible
+	url = git@gitlab.com:polytechnique-montr-al/log3900/24-1/equipe-103/spot-sev-ansible.git
+	branch = main

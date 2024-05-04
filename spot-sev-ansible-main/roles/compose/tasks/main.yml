@@ -1,0 +1,29 @@
+- name: Create docker directory
+  file:
+    path: /home/{{ ansible_user }}/docker
+    state: directory
+    mode: 0755
+  tags:
+    - compose
+
+- name: Create Docker Compose File
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: /home/{{ ansible_user }}/docker/docker-compose.yml
+  tags:
+    - compose
+
+- name: Stop docker compose file 
+  command: docker compose down
+  args:
+    chdir: /home/{{ ansible_user }}/docker
+  tags: 
+    - compose
+
+# docker-compose module would be more clean but it seems to only work with docker-compose version 2.0 and under
+- name: Start Docker Compose
+  command: docker compose up -d --build
+  args:
+    chdir: /home/{{ ansible_user }}/docker
+  tags:
+    - compose

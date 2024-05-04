@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  spot_seven:
+    image: registry.gitlab.com/polytechnique-montr-al/log3900/24-1/equipe-103/log3900-103:deploy_v1.12.0
+    networks:
+      - traefik
+      - internal
+    labels:
+      traefik.enable: true
+      traefik.http.routers.spot_seven.rule: Host(`api.spot-seven.step.polymtl.ca`)
+      traefik.http.routers.spot_seven.tls: true
+      traefik.http.routers.spot_seven.tls.certresolver: direct-resolver
+    depends_on:
+      - db
+    volumes:
+      - ./uploads:/app/uploads
+      - ./differences:/app/assets/differences
+    env_file:
+      - .env
+    ports:
+      - 3000:3000
+
+  db:
+    image: postgres
+    env_file:
+      - .env
+    ports:
+      - 5432:5432
+    networks:
+      - internal
+
+
+
+networks:
+  traefik:
+    external: true
+  internal:

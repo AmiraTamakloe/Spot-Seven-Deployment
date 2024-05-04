@@ -1,0 +1,6 @@
+MONGO_INITDB_ROOT_USERNAME: "changeme"
+MONGO_INITDB_ROOT_PASSWORD: "changeme"
+DOMAIN_NAME: "api.spot-seven.step.polymtl.ca"
+IMAGE_TAG: "registry.gitlab.com/polytechnique-montr-al/log2990/20231/equipe-201/log2990-201:deploy_sprint3"
+gitlab_username: "my_user"
+gitlab_password: "my_password"

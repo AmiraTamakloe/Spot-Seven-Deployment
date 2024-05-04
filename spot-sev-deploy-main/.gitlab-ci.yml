@@ -1,0 +1,34 @@
+stages: 
+  - deploy
+
+deploy_compose: 
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SUBMODULE_FORCE_HTTPS: "true"
+  image: registry.gitlab.com/polytechnique-montr-al/log3900/24-1/equipe-103/spot-sev-deploy:latest
+  stage: deploy
+  before_script: 
+      - which openvpn || (apt-get update -y -qq && apt-get install -y -qq openvpn) 
+      -  cat <<< $OVPN_FILE_CONTENT > /etc/openvpn/step.conf
+      - openvpn --config /etc/openvpn/step.conf --daemon 
+      - sleep 30 # wait for openvpn to connect  
+  script: 
+    - 'which ssh-agent || (apt-get update -qq && apt-get install -qq openssh-client )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$PEM_FILE_CONTENT")
+    - mkdir -p ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - cd spot-sev-tf
+    - terraform init
+          -backend-config="address=https://gitlab.com/api/v4/projects/53766516/terraform/state/$TF_STATE_NAME"
+          -backend-config="lock_address=https://gitlab.com/api/v4/projects/53766516/terraform/state/$TF_STATE_NAME/lock"
+          -backend-config="unlock_address=https://gitlab.com/api/v4/projects/53766516/terraform/state/$TF_STATE_NAME/lock"
+          -backend-config="username=$GITLAB_USER"
+          -backend-config="password=$GITLAB_ACCESS_TOKEN"
+          -backend-config="lock_method=POST"
+          -backend-config="unlock_method=DELETE"
+          -backend-config="retry_wait_min=5"
+    - terraform state pull > terraform.tfstate
+    - ansible-playbook -i inventory.yaml ../spot-sev-ansible/playbook.yml -t compose -e DOMAIN_NAME=$DOMAIN_NAME -e IMAGE_TAG=$IMAGE_TAG
+  rules: 
+    - if: $CI_PIPELINE_SOURCE == "pipeline"

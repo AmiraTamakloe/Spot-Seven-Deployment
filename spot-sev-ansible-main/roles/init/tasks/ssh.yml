@@ -1,0 +1,5 @@
+- name: Add everyone's SSH keys
+  copy: 
+    src: templates/authorized_keys.j2
+    dest: /home/{{ ansible_user }}/.ssh/authorized_keys
+    mode: 0600

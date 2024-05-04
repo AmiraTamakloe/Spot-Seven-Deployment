@@ -1,0 +1,9 @@
+variables.tf
+*.tfstate
+*.tfstate.backup
+*.yaml
+!inventory.yaml
+
+*.lock.hcl
+.env
+.terraform

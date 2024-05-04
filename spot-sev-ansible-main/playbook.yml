@@ -1,0 +1,13 @@
+- name: deploy spot sev
+  hosts: toDeploy
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - init
+    - traefik
+    - compose
+  vars_files:
+    - vars.yaml
+  vars:
+    ansible_ssh_timeout: 120

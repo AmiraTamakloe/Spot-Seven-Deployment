@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  spot_seven:
+    image: registry.gitlab.com/polytechnique-montr-al/log2990/20231/equipe-201/log2990-201:deploy_sprint3
+    networks:
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.spot_seven.rule=Host(`spot-seven.com`)
+      - traefik.http.routers.spot_seven.entrypoints=web
+      - traefik.http.routers.spot_seven.tls=true
+      - traefik.http.routers.spot_seven.tls.certresolver=letsencrypt
+      - traefik.http.routers.spot_seven.tls.domains[0].main=spot-seven.com
+      - traefik.http.routers.spot_seven.tls.domains[0].sans=*.spot-seven.com
+      - traefik.http.routers.spot_seven.middlewares=spot_seven_stripprefix
+    environment:
+      - DATABASE_CONNECTION_STRING=mongodb://mongodb/
+    ports:
+      - 3000:3000
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo
+    networks:
+      - traefik
+    restart: always
+    volumes:
+      - ./data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "admin"
+      MONGO_INITDB_ROOT_PASSWORD: "password"
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: "admin"
+      ME_CONFIG_MONGODB_ADMINPASSWORD: "password"
+      ME_CONFIG_MONGODB_URL: "mongodb://admin:password@mongo:27017/"
+
+networks:
+  traefik:
+    external: true
